@@ -1,0 +1,111 @@
+---
+- name: Configure local server for challenge
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+  
+  tasks:
+  - name: Install Docker and other needed packages
+    apt:
+      name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg2
+          - software-properties-common
+          - docker.io
+          - conntrack
+          - python3-pip
+          - chrony
+      state: present
+      update_cache: no
+  
+  - name: Install Docker extensions for Ansible
+    pip:
+      name:
+          - docker
+
+  - name: Create a data volume for GOGS
+    docker_volume:
+      name: gogsdata
+
+  - name: Create docker network 
+    shell: "{{ item }}"
+    with_items:
+    - docker network disconnect skynet gogs
+    - docker network disconnect skynet jenkins
+    - docker network rm skynet
+    - docker network create --subnet=100.0.0.0/24 skynet
+    args:
+      warn: no
+    ignore_errors: yes
+
+  - name: Create GOGS container
+    docker_container:
+      name: gogs
+      image: gogs/gogs
+      networks:
+        - name: skynet
+          ipv4_address: "100.0.0.2"
+      mounts:
+        - source: gogsdata
+          target: /data
+      ports:
+        - "9022:22"
+        - "3000:3000"
+      recreate: yes
+      restart_policy: unless-stopped
+
+  - name: Create a data volume for Jenkins
+    docker_volume:
+      name: jenkinsdata
+
+  - name: Create Jenkins container
+    docker_container:
+      name: jenkins
+      image: jenkins/jenkins:lts
+      networks:
+        - name: skynet
+          ipv4_address: "100.0.0.3"
+      mounts:
+        - source: jenkinsdata
+          target: /var/jenkins_home
+      ports:
+        - "8080:8080"
+        - "50000:50000"
+      recreate: yes
+      restart_policy: unless-stopped
+
+  - name: Install Minikube prerequisites
+    apt:
+      name: 
+          - conntrack 
+          - socat
+      state: present
+      update_cache: no
+
+  - name: Download and install Minikube and Kubectl
+    shell: |
+      curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+      chmod +x ./kubectl
+      sudo mv ./kubectl /usr/local/bin/kubectl
+
+      wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+      chmod +x minikube-linux-amd64
+      mv minikube-linux-amd64 /usr/local/bin/minikube
+
+      sudo sysctl fs.protected_regular=0
+    args:
+      warn: no
+
+  - name: Check if Minikube is running
+    shell: ps | grep "kube-apiserver" | grep -v grep
+    ignore_errors: yes
+    changed_when: false
+    register: minikube_is_running
+
+  - name: Start Minikube if not running
+    command: minikube start --driver=none
+    when: minikube_is_running.rc == 1
+
+

@@ -1,0 +1,24 @@
+---
+- name: Configure local server for challenge
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+  tasks:
+  - name: Temporarely disable IPv6
+    command: "{{ item }}"
+    with_items:
+    - sysctl -w net.ipv6.conf.all.disable_ipv6=1
+    - sysctl -w net.ipv6.conf.default.disable_ipv6=1
+    - sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: 'yes'
+      update_cache: 'yes'
+      cache_valid_time: 86400 #One day
+      
+  - name: Change hostname
+    hostname:
+      name: "{{ new_hostname }}"
+

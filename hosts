@@ -1,0 +1,2 @@
+[challenge_lab]
+localhost ansible_connection=local new_hostname=labsrv
