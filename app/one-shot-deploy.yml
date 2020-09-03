@@ -91,11 +91,20 @@
   
   # should check if ES is not already deployed . Maybe here is a break point to only (re)deploy ES
 
+  # TODO: consider purging only if the pods exist
+
+  # NOTE: this contains a really ugly hack (restarting minikube) due to a bug in readiness probe from Elastic
+  # NOTE: check etcd, maybe this can be used to clean up the config
   - name: Purge existing ElasticSearch
     shell: "{{ item }}"
     with_items:
     - make purge
-    - kubectl uncordon $HOSTNAME
+    - kubectl delete pvc --all
+    - kubectl delete pv --all
+    - minikube stop 
+    - docker volume prune -f 
+    - minikube start --driver=none
+    - "kubectl uncordon {{ ansible_env.HOSTNAME }}"
     args:
       warn: no
       chdir: ./prod/elasticsearch
@@ -103,18 +112,18 @@
 
   - pause:
       minutes: 1
-      prompt: "INFO: Waiting 1 minutes for pods to gracefully terminate"
+      prompt: "INFO: Waiting 1 minutes for cluster to stabilize"
 
   - name: Deploy ElasticSearch
     shell: "{{ item }}"
     with_items:
     - make secrets
-    - make
+    - make install
     args:
       warn: no
       chdir: ./prod/elasticsearch
 
-# now should wait/check until ES is online
+  # now should wait/check until ES is online
 
   - name: Purge existing Logstash
     shell: "{{ item }}"
@@ -128,12 +137,12 @@
   - name: Deploy Logstash
     shell: "{{ item }}"
     with_items:
-    - make
+    - make install
     args:
       warn: no
       chdir: ./prod/logstash
 
-# now should wait/check until ES is online
+  # now should wait/check until ES is online
 
   - name: Purge existing Kibana
     shell: "{{ item }}"
@@ -147,8 +156,24 @@
   - name: Deploy Kibana
     shell: "{{ item }}"
     with_items:
-    - make
+    - make install
     args:
       warn: no
       chdir: ./prod/kibana
 
+  - name: Purge existing FileBeat
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    args:
+      warn: no
+      chdir: ./prod/filebeat
+    ignore_errors: True
+
+  - name: Deploy FileBeat
+    shell: "{{ item }}"
+    with_items:
+    - make install
+    args:
+      warn: no
+      chdir: ./prod/filebeat

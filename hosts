@@ -1,2 +1,2 @@
 [challenge_lab]
-localhost ansible_connection=local new_hostname=labsrv
+localhost ansible_connection=local ansible_sudo_pass=P@ssw0rd new_hostname=labsrv
