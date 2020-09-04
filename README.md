@@ -30,18 +30,30 @@ Supporting infrastructure
 
 **SOLUTION ARCHITECTURE**
 
-_Ubuntu 20.04 VM - LABSRV_
-[Docker](https://www.docker.com/):          |                                .1 (network gateway)
--- [GOGS](https://gogs.io/)           |                                .2
--- [Jenkins](https://www.jenkins.io/)        | network=skynet 100.0.0.0/24    .3
--- [Nikto](https://cirt.net/Nikto2)          |                                .4
-[Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) for [ELK](https://www.elastic.co/)
--- ElasticSearch-0,-1,-2
--- Logstash
--- Kibana                                                P: int 5601 -> ext: 30300 ; NodePort
--- FileBeat
-[Ansible](https://www.ansible.com/)
-[Helm](https://helm.sh/)
+'
+[[ Ubuntu 20.04 VM - LABSRV ]]
+- [Docker]          |                                   .1 (network gateway)
+-- {GOGS}           |                                   .2
+-- {Jenkins}        |--> network=skynet 100.0.0.0/24    .3
+-- {Nikto}          |                                   .4
+- [Minikube]
+-- {ElasticSearch-0},{-1},{-2}
+-- {Logstash}
+-- {Kibana}                       P: int 5601 -> ext: 30300 ; NodePort
+-- {FileBeat}
+- [Ansible]
+- [Helm]
+'
+
+Components:
+* [Docker](https://www.docker.com/)
+* [GOGS](https://gogs.io/)
+* [Nikto](https://cirt.net/Nikto2) 
+* [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
+* [ELK](https://www.elastic.co/)
+* [Ansible](https://www.ansible.com/)
+* [Helm](https://helm.sh/)
+* [GOSS](https://github.com/aelsabbahy/goss)
 
 1. SSH into the VM (LABSRV)
 
@@ -102,3 +114,5 @@ git push -u origin master
   http://localhost:18888/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
   
   
+Helpful references:
+* [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)

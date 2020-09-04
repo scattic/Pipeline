@@ -9,7 +9,7 @@ String kb_regex = "**/${kb_dir}/**"
 String fb_regex = "**/${fb_dir}/**"
 
 def remote = [:]
-remote.name = 'buildserver'
+remote.name = 'labsrv'
 remote.host = '100.0.0.1'
 remote.user = 'ladmin'
 remote.password = 'P@ssw0rd'
@@ -29,6 +29,7 @@ pipeline {
         
         stage("Sanity check") {
             steps {
+                echo "This job will build: $DEPLOY"
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/sanity-test.yaml"
             }
             post{
@@ -45,8 +46,8 @@ pipeline {
         stage("BUILD Elasticsearch") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset es_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -64,8 +65,8 @@ pipeline {
         stage("TEST Elasticsearch") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset es_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -85,8 +86,8 @@ pipeline {
         stage("BUILD Logstash") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset ls_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -98,8 +99,8 @@ pipeline {
         stage("TEST Logstash") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset ls_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -112,8 +113,8 @@ pipeline {
         stage("BUILD Kibana") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset kb_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -131,9 +132,8 @@ pipeline {
         stage("TEST Kibana") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
-                }
+                    changeset kb_regex
+                    expression { params.DEPLOY == 'everything' }                }
             }
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/kibana/test.yaml"
@@ -152,8 +152,8 @@ pipeline {
         stage("BUILD Filebeat") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset fb_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
@@ -171,8 +171,8 @@ pipeline {
         stage("TEST Filebeat") {
            when { 
                 anyOf {
-                    expression {params.DEPLOY == "everything"} ;
-                    changeset es_regex 
+                    changeset fb_regex
+                    expression { params.DEPLOY == 'everything' }
                 }
             }
             steps {
