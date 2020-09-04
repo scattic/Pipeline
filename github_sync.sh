@@ -5,7 +5,7 @@ echo This script will push changes from GOGS --> GitHub
 echo WARNING: changes on GitHub will not be considered, and will break the sync
 
 cd /mnt/challenge/
-git pull
+git pull origin master
 git add . 
 git commit -m "update"
 git push -u 
