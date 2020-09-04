@@ -16,12 +16,12 @@ Prerequisites
 
 2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 
-*Clone*
-* git clone https://github.com/scattic/pipeline.git _OR_
+    *Clone*
+    * git clone https://github.com/scattic/pipeline.git _OR_
 
-*Mount*
-* sudo mkdir /mnt/challenge
-* sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
+    *Mount*
+    * sudo mkdir /mnt/challenge
+    * sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
 
 3. Enable the SSH server if needed (only if you're not on Ubuntu Server).
 
