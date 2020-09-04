@@ -7,11 +7,11 @@ supporting infrastructure with Ansible and setting up a Jenkins pipeline to tie 
 
 To replicate the playground environment you should follow the steps below, in order.
 
-**SOLUTION ARCHITECTURE**
+**SOLUTION ARCHITECTURE OVERVIEW**
 
 ```
 [ Ubuntu 20.04 VM - LABSRV ]
-- Docker              |                                   .1 (network gateway)
+- Docker               |                                   .1 (network gateway)
   - { GOGS }           |                                   .2
   - { Jenkins }        |--> network=skynet 100.0.0.0/24    .3
   - { Nikto }          |                                   .4
@@ -38,8 +38,8 @@ Components:
 ## Prerequisites
 
 1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM. 
-  * The normal user account should be called 'ladmin', with the password 'P@ssw0rd'
-  * In case you create a different account, don't forget to update the Jenkins job
+  * The normal user account should be called `ladmin`, with the password `P@ssw0rd`
+  * In case you create a different account, don't forget to update the Jenkins job.
   * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground.
   * VirtualBox VM will have two network adapters, one for NAT (or NAT-network) and a Host-Only adapter. The 192.168.56.0 range represents the Host-Only adapter network.
 
@@ -154,6 +154,9 @@ http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParam
 * `values.yaml` in the component folder contains the values we chose to customize for our deployment
 * Under `./app/prod/tests` there are few more tests, such as web-app vulnerability scanning with Nikto.
 **NOTE**: Nikto scan has been limited to 60s execution time for ....development efficiency. This limitation would obviously be removed in a production environment.
+* The Jenkins pipeline is parametrized. DEPLOY=everything means all items will be built. DEPLOY=changes means that if a change was made in a component folder (eg filebeat), then only that component will be built (but all tests will still be executed).
+* The Jenkins pipeline will be triggered by a WebHook, which is actually a Jenkins API call.
+* The Jenkinsfile in cicd is not actually valid Jenkinsfile syntax, although it might work with a few small changes.
 
 ## Helpful references:
 * [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)
