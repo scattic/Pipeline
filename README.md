@@ -2,7 +2,7 @@
 
 ## Intro
 
-This repository contains code for a IaaC/CaaC deployment of ELK & Beats on Kubernetes, along with provisioning
+This repository contains code for a IaC/CaC deployment of ELK & Beats on Kubernetes, along with provisioning
 supporting infrastructure with Ansible and setting up a Jenkins pipeline to tie all pieces together.
 
 To replicate the playground environment you should follow the steps below, in order.
