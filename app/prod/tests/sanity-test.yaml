@@ -1,3 +1,13 @@
 ---
+- name: Build environment sanity check 
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
 
-...
+  tasks:
+
+  - name: Check if Minikube is ready, fail if it is not
+    shell: minikube status | grep Running | wc -l | grep 3
+    register: minikube_check
+    failed_when: "('3' not in minikube_check.stdout)"
+

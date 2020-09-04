@@ -34,6 +34,7 @@
     with_items:
     - docker network disconnect skynet gogs
     - docker network disconnect skynet jenkins
+    - docker network disconnect skynet nikto
     - docker network rm skynet
     - docker network create --subnet=100.0.0.0/24 skynet
     args:
@@ -56,6 +57,23 @@
       recreate: yes
       restart_policy: unless-stopped
 
+  - name: Create a data volume for Nikto
+    docker_volume:
+      name: niktodata
+
+  - name: Create Nikto container
+    docker_container:
+      name: nikto
+      image: securecodebox/nikto
+      networks:
+        - name: skynet
+          ipv4_address: "100.0.0.4"
+      mounts:
+        - source: niktodata
+          target: /test
+      recreate: yes
+      restart_policy: unless-stopped
+
   - name: Create a data volume for Jenkins
     docker_volume:
       name: jenkinsdata
@@ -70,6 +88,8 @@
       mounts:
         - source: jenkinsdata
           target: /var/jenkins_home
+        - source: niktodata
+          target: /nikto
       ports:
         - "8080:8080"
         - "50000:50000"

@@ -1,3 +1,4 @@
+#!/bin/bash
 cd app/prod/kibana
 make purge
 cd ../../..
@@ -9,3 +10,4 @@ make purge
 minikube stop
 docker container stop gogs 
 docker container stop jenkins 
+docker volume prune -f

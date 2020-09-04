@@ -1,0 +1,26 @@
+---
+- name: Deploy Filebeat on Kubernetes (minikube) using Helm
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+# TODO: consider converting this into a role with galaxy
+
+  tasks:
+
+  - name: Purge existing FileBeat
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    args:
+      warn: no
+      #chdir: ./prod/filebeat
+    ignore_errors: True
+
+  - name: Deploy FileBeat
+    shell: "{{ item }}"
+    with_items:
+    - make install
+    args:
+      warn: no
+      #chdir: ./prod/filebeat

@@ -1,18 +1,41 @@
-Deploy prerequisites
-====================
+DevOps Pipeline Playground
+==========================
 
-SSH into the box:
-  sudo mkdir /mnt/challenge
-  sudo mount -t vboxsf Challenge /mnt/challenge
-  cd /mnt/challenge/1\ -\ prerequisites/
-  chmod +x deploy_prereq.sh
-  ./deploy_prereq.sh
-  
+Intro
+-----
 
-  
-  At this step just launch the playbook
+This repository contains code for a IaaC/CaaC deployment of ELK & Beats on Kubernetes, along with provisioning
+supporting infrastructure with Ansible and setting up a Jenkins pipeline to tie all pieces together.
 
-ansible-playbook -i ../1\ -\ prerequisites/hosts supporting_infra.yaml 
+To replicate the playground environment you should follow the steps below, in order.
+
+Prerequisites
+-------------
+
+1. Start with a freshly installed VM of Ubuntu Server 20.04. VirtualBox is a nice hypervisor to host the VM.
+
+2. Clone this git repo into a folder, or mount the folder with the repo contents from the host. If/when you see /mnt/challenge below, that is the root of the source code folder. 
+
+Clone
+* git clone [this url]
+Mount
+* sudo mkdir /mnt/challenge
+* sudo mount -t vboxsf Challenge /mnt/challenge
+
+3. Enable SSH server if needed (only if you're not on Ubuntu Server).
+
+Supporting infrastructure
+-------------------------
+
+1. SSH into the VM
+
+  * cd /mnt/challenge
+  * ./deploy_prereq.sh
+
+This will install Ansible, create the hosts file and then launch the prereq.yaml Ansible playbook.
+
+The Ansible playbook will complete these actions:
+
 
 After the playbook is finished you'll still need to:
 

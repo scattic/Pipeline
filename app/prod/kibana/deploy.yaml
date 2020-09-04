@@ -1,0 +1,24 @@
+---
+- name: Deploy Kibana on Kubernetes (minikube) using Helm
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+# TODO: consider converting this into a role with galaxy
+
+  tasks:
+
+  - name: Purge existing Kibana
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    args:
+      warn: no
+    ignore_errors: True
+
+  - name: Deploy Kibana
+    shell: "{{ item }}"
+    with_items:
+    - make install
+    args:
+      warn: no

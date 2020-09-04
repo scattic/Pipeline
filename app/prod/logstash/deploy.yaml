@@ -1,0 +1,26 @@
+---
+- name: Deploy Logstash on Kubernetes (minikube) using Helm
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+# TODO: consider converting this into a role with galaxy
+
+  tasks:
+
+  - name: Purge existing Logstash
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    args:
+      warn: no
+      #chdir: ./prod/logstash
+    ignore_errors: True
+
+  - name: Deploy Logstash
+    shell: "{{ item }}"
+    with_items:
+    - make install
+    args:
+      warn: no
+      #chdir: ./prod/logstash

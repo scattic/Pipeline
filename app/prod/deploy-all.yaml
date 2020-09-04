@@ -1,0 +1,17 @@
+---
+- name: One-shot deployment of all ELK components
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+  
+- name: Deploy Elasticsearch
+  import_playbook: ./elasticsearch/deploy.yaml
+  
+- name: Deploy Logstash
+  import_playbook: ./logstash/deploy.yaml 
+  
+- name: Deploy Kibana
+  import_playbook: ./kibana/deploy.yaml
+  
+- name: Deploy Filebeat
+  import_playbook: ./filebeat/deploy.yaml   

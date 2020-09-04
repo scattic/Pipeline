@@ -1,0 +1,64 @@
+---
+- name: Deploy Elasticsearch on Kubernetes (minikube) using Helm
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+# TODO: consider converting this into a role with galaxy
+
+  tasks:
+
+  # check if minikube is ready
+
+  - name: Check if Minikube is ready, fail if it is not
+    shell: minikube status | grep Running | wc -l | grep 3
+    register: minikube_check
+    failed_when: "('3' not in minikube_check.stdout)"
+
+  - name: Check if Elasticsearch pods are already running
+    shell: kubectl get pods | grep elasticsearch-master | grep Running | wc -l
+    register: elpods_check
+
+  # if the pods are Running, just purge
+  # if the pods are _not_ running (eg they got stuck or something) we'll need a full rebuild
+
+  # NOTE: this contains a really ugly hack (restarting minikube) due to a bug in readiness probe from Elastic
+  # NOTE: check etcd, maybe this can be used to clean up the config
+  - name: Purge existing ElasticSearch - full
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    - kubectl delete pvc --all
+    - kubectl delete pv --all
+    - minikube stop 
+    - docker volume prune -f 
+    - minikube start --driver=none
+    - "kubectl uncordon {{ ansible_env.HOSTNAME }}"
+    args:
+      warn: no
+      #chdir: ./prod/elasticsearch
+    ignore_errors: True
+    when: "('3' not in elpods_check.stdout)" # could NOT find 3 running pods
+
+  - name: Purge existing ElasticSearch - short
+    shell: "{{ item }}"
+    with_items:
+    - make purge
+    args:
+      warn: no
+      #chdir: ./prod/elasticsearch
+    ignore_errors: True
+    when: "('3' in elpods_check.stdout)" # did find 3 running pods
+
+  - pause:
+      minutes: 1
+      prompt: "INFO: Waiting 1 minute for the cluster to stabilize"
+
+  - name: Deploy ElasticSearch
+    shell: "{{ item }}"
+    with_items:
+    - make secrets
+    - make install
+    args:
+      warn: no
+      #chdir: ./prod/elasticsearch

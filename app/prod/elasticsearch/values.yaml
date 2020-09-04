@@ -37,3 +37,9 @@ extraEnvs:
 #esConfig:
 #  elasticsearch.yml: |
 #    node.rack: rack123
+
+#esConfig:
+#  elasticsearch.yml: |
+#    key:
+#      nestedkey: value
+#    dot.notation: test

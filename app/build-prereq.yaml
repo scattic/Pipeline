@@ -1,0 +1,76 @@
+---
+- name: Install ELK-k8 build prereq
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+  
+  tasks:
+
+  # some prerequisites, such as Helm, ES Helm Charts and couple of settings
+
+  - name: Add Helm repo key
+    apt_key:
+      url: https://baltocdn.com/helm/signing.asc
+      state: present
+
+  - name: Add Helm repo
+    apt_repository:  
+      repo: deb https://baltocdn.com/helm/stable/debian/ all main
+      state: present
+      filename: helm-stable-debian
+    
+  - name: Install Helm v3
+    apt:
+      name: 
+      - helm
+      state: present
+      update_cache: yes
+
+  - name: Configure Minikube storage for ElasticSearch
+    command: "{{ item }}"
+    with_items:
+    - minikube addons enable default-storageclass
+    - minikube addons enable storage-provisioner
+
+  - name: Download latest release of Elastic Charts
+    get_url:
+      url: https://github.com/elastic/helm-charts/archive/7.9.0.tar.gz
+      dest: ./elastic-charts.tgz
+
+  - name: Create Charts output directory
+    file:
+      path: ./helm-charts
+      state: directory
+
+  - name: Extracting Charts
+    shell: "{{ item }}"
+    with_items:
+    - rm -r ./helm-charts/*
+    - tar xvf ./elastic-charts.tgz -C ./helm-charts
+    - mv ./helm-charts/helm-charts-*/* ./helm-charts
+    - rm -r ./helm-charts/helm-charts-*
+    args:
+      warn: no
+    ignore_errors: True
+
+  - name: Installing GOSS
+    shell: "{{ item }}"
+    with_items:
+    - curl -L https://github.com/aelsabbahy/goss/releases/latest/download/goss-linux-amd64 -o /usr/local/bin/goss
+    - chmod +rx /usr/local/bin/goss
+    - curl -L https://github.com/aelsabbahy/goss/releases/latest/download/dgoss -o /usr/local/bin/dgoss
+    - chmod +rx /usr/local/bin/dgoss
+    args:
+      warn: no
+      creates: /usr/local/bin/goss
+
+#  - name: Installing DGOSS (for Docker)
+#    shell: "{{ item }}"
+#    with_items:
+#    - curl -L https://github.com/aelsabbahy/goss/releases/latest/download/dgoss -o /usr/local/bin/dgoss
+#    - chmod +rx /usr/local/bin/dgoss
+#    args:
+#      warn: no
+#      creates: /usr/local/bin/dgoss
+
+ 
