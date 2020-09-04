@@ -43,14 +43,14 @@ Components:
   * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground.
   * VirtualBox VM will have two network adapters, one for NAT (or NAT-network) and a Host-Only adapter. The 192.168.56.0 range represents the Host-Only adapter network.
 
-2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
+2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder inside the VM, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 
   *Clone*
-  * git clone https://github.com/scattic/pipeline.git _OR_
+  * `git clone https://github.com/scattic/pipeline.git` _OR_
 
   *Mount*
-  * sudo mkdir /mnt/challenge
-  * sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
+  * `sudo mkdir /mnt/challenge`
+  * `sudo mount -t vboxsf <name-of-VBOX-shared-folder> /mnt/challenge`
 
 3. Enable the SSH server if needed (only if you're not on Ubuntu Server).
 
@@ -60,16 +60,19 @@ Components:
 
 `ssh -L 3000:127.0.0.1:3000 -L 8080:127.0.0.1:8080 -L 5601:127.0.0.1:30300 ladmin@192.168.56.13` 
 
+**NOTE**: we're using local port forwarding via SSH, to access the apps with the VM environment (incl those running on Docker & K8) from the host system.
+
 and then,
 
 ```
 cd /mnt/challenge
 ./deploy_prereq.sh
+ansible-playbook -i hosts supporting_infra.yaml
 ```
 
-*deploy_prereq.sh* will install Ansible, create the hosts file and then launch the *prereq.yaml* Ansible playbook.
+*deploy_prereq.sh* will install Ansible, create the hosts file and then launch the *prereq.yaml* Ansible playbook which will change the hostname.
 
-The *prereq.yaml* Ansible playbook will complete several actions, such as:
+The *supporting_infra.yaml* Ansible playbook will complete several actions, such as:
 * install required packages (apt and pip), such as Docker
 * create a Docker network (for IP addresses predictibility)
 * deploy GOGS in a container, with a persistent volume and forward port 3000
@@ -78,7 +81,7 @@ The *prereq.yaml* Ansible playbook will complete several actions, such as:
 * download and install minikube and kubectl
 * start Kubernetes cluster on minikube using existing Docker
 
-After this playbook has completed for _the first time_ you'll need to:
+After this last playbook has completed for _the first time_ you'll need to:
 
 ### Configure Jenkins
 
@@ -87,6 +90,10 @@ After this playbook has completed for _the first time_ you'll need to:
 3. Install default plugins
 4. Create user zeus/zeus (or anything of your choosing, just remember it)
 5. Create a user token for API calls: `http://localhost:8080/user/zeus/configure`
+6. Install the following Jenkins plugins:
+    - GOGS
+    - SSH
+    - Last Changes
 
 **NOTE**: we'll configure the pipeline job in the next sections, remember that the token you've just created will be called `<USER-API-TOKEN>`.
 
@@ -94,8 +101,9 @@ After this playbook has completed for _the first time_ you'll need to:
 
 1. Using a browser, from the *host* where the LABSRV VM is running, open `http://localhost:3000`
 2. create a user zeus/zeus
-3. create a new repository called 'pipeline'
-4. back on LABSRV VM, sync the GitHub clone of this repo with the GOGS copy:
+3. choose SQLite3 as the DB
+4. create a new repository called 'pipeline'
+5. back on LABSRV VM, sync the GitHub clone of this repo with the GOGS copy:
 
 ```
 cd *folder_where_you_cloned_github*
