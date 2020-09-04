@@ -12,20 +12,37 @@ To replicate the playground environment you should follow the steps below, in or
 Prerequisites
 -------------
 
-1. Start with a freshly installed VM of Ubuntu Server 20.04. VirtualBox is a nice hypervisor to host the VM.
+1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM.
 
-2. Clone this git repo into a folder, or mount the folder with the repo contents from the host. If/when you see /mnt/challenge below, that is the root of the source code folder. 
+2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 
-Clone
-* git clone [this url]
-Mount
+*Clone*
+* git clone https://github.com/scattic/pipeline.git _OR_
+
+*Mount*
 * sudo mkdir /mnt/challenge
-* sudo mount -t vboxsf Challenge /mnt/challenge
+* sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
 
-3. Enable SSH server if needed (only if you're not on Ubuntu Server).
+3. Enable the SSH server if needed (only if you're not on Ubuntu Server).
 
 Supporting infrastructure
 -------------------------
+
+**SOLUTION ARCHITECTURE**
+
+`
+[ Ubuntu 20.04 VM ]
+	- Docker:          |                                .1
+   -- GOGS           |                                .2
+   -- Jenkins        | network=skynet 100.0.0.0/24    .3
+   -- Nikto          |                                .4
+  - Minikube (K8)
+   -- ElasticSearch-0,-1,-2
+   -- Logstash
+   -- Kibana                                                P: int 5601 -> ext: 30300 ; NodePort
+   -- FileBeat
+  - Ansible
+`
 
 1. SSH into the VM
 
@@ -35,6 +52,7 @@ Supporting infrastructure
 This will install Ansible, create the hosts file and then launch the prereq.yaml Ansible playbook.
 
 The Ansible playbook will complete these actions:
+* install several required packages (apt and pip), such as Docker
 
 
 After the playbook is finished you'll still need to:

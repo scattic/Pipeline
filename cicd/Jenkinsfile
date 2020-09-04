@@ -1,0 +1,201 @@
+String es_dir = "elasticsearch"
+String ls_dir = "logstash"
+String kb_dir = "kibana"
+String fb_dir = "filebeat"
+
+String es_regex = "**/${es_dir}/**"
+String ls_regex = "**/${ls_dir}/**"
+String kb_regex = "**/${kb_dir}/**"
+String fb_regex = "**/${fb_dir}/**"
+
+def remote = [:]
+remote.name = 'buildserver'
+remote.host = '100.0.0.1'
+remote.user = 'ladmin'
+remote.password = 'P@ssw0rd'
+remote.allowAnyHosts = true   
+
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage("checkout") {
+            steps {
+                git url: 'http://100.0.0.2:3000/zeus/pipeline.git'
+            }
+        }
+        
+        stage("sanity check") {
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/sanity-test.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Sanity check failed, exiting now..."
+                    }
+                }
+            }
+        }
+        
+        /* --------------------------- Elasticsearch ---------------------------*/
+
+        stage("build-elasticsearch") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/elasticsearch/deploy.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Elasticsearch deployment failed, exiting now..."
+                    }
+                }
+            }
+        }
+        
+        stage("test-elasticsearch") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/elasticsearch/test.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Elasticsearch test failed, exiting now..."
+                    }
+                }
+            }
+        }
+
+        /* --------------------------- Logstash ---------------------------*/
+    
+        stage("build-logstash") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/logstash/deploy.yaml"
+            }
+            /* since it's not really used by anything atm, this can fail but the job can continue */
+        }
+        
+        stage("test-logstash") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/logstash/test.yaml"
+            }
+        }
+
+        /* --------------------------- Kibana ---------------------------*/
+
+        stage("build-kibana") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/kibana/deploy.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Kibana deployment failed, exiting now..."
+                    }
+                }
+            }
+        }
+        
+        stage("test-kibana") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/kibana/test.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Kibana test failed, exiting now..."
+                    }
+                }
+            }
+        }
+
+        /* --------------------------- Filebeat ---------------------------*/
+
+        stage("build-filebeat") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/filebeat/deploy.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Filebeat deployment failed, exiting now..."
+                    }
+                }
+            }
+        }
+        
+        stage("test-filebeat") {
+           when { 
+                anyOf {
+                    expression {params.DEPLOY == "everything"} ;
+                    changeset es_regex 
+                }
+            }
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/filebeat/test.yaml"
+            }
+            post{
+                failure {
+                    script{
+                        error "Filebeat test failed, exiting now..."
+                    }
+                }
+            }
+        }
+
+        /* --------------------------- Mo testing ---------------------------*/
+
+        stage("test-security") {
+
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/test/security-test.yaml"
+            }
+        }
+        
+
+    }
+}

@@ -1,0 +1,17 @@
+---
+- name: Test deployment of Kibana
+  hosts: challenge_lab
+  become: yes
+  become_method: sudo
+
+  tasks:
+
+  # check if minikube is ready
+
+  - name: Run test suite
+    shell: timeout 120s make test
+    register: output
+    #failed_when: "('3' not in minikube_check.stdout)"
+
+  - debug: 
+      var: output
