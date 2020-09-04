@@ -63,12 +63,6 @@ pipeline {
         }
         
         stage("TEST Elasticsearch") {
-           when { 
-                anyOf {
-                    changeset es_regex
-                    expression { params.DEPLOY == 'everything' }
-                }
-            }
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/elasticsearch/test.yaml"
             }
@@ -97,12 +91,6 @@ pipeline {
         }
         
         stage("TEST Logstash") {
-           when { 
-                anyOf {
-                    changeset ls_regex
-                    expression { params.DEPLOY == 'everything' }
-                }
-            }
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/logstash/test.yaml"
             }
@@ -130,11 +118,6 @@ pipeline {
         }
         
         stage("TEST Kibana") {
-           when { 
-                anyOf {
-                    changeset kb_regex
-                    expression { params.DEPLOY == 'everything' }                }
-            }
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/kibana/test.yaml"
             }
@@ -169,12 +152,6 @@ pipeline {
         }
         
         stage("TEST Filebeat") {
-           when { 
-                anyOf {
-                    changeset fb_regex
-                    expression { params.DEPLOY == 'everything' }
-                }
-            }
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/filebeat/test.yaml"
             }
@@ -190,7 +167,6 @@ pipeline {
         /* --------------------------- Mo testing ---------------------------*/
 
         stage("TEST Security") {
-
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/security-test.yaml"
             }
@@ -199,7 +175,6 @@ pipeline {
         /* --------------------------- Landing ---------------------------*/
 
         stage("Cleanup and Report") {
-
             steps {
                 echo "Sending report with email and deleting build artefacts"
             }

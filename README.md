@@ -37,22 +37,29 @@ Components:
 
 ## Prerequisites
 
-1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM.
+1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM. 
+  * The normal user account should be called 'ladmin', with the password 'P@ssw0rd'
+  * In case you create a different account, don't forget to update the Jenkins job
+  * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground.
 
 2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 
-    *Clone*
-    * git clone https://github.com/scattic/pipeline.git _OR_
+  *Clone*
+  * git clone https://github.com/scattic/pipeline.git _OR_
 
-    *Mount*
-    * sudo mkdir /mnt/challenge
-    * sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
+  *Mount*
+  * sudo mkdir /mnt/challenge
+  * sudo mount -t vboxsf _name-of-VBOX-shared-folder_ /mnt/challenge
 
 3. Enable the SSH server if needed (only if you're not on Ubuntu Server).
 
 ## Supporting infrastructure
 
 1. SSH into the VM (LABSRV)
+
+`ssh -L 3000:127.0.0.1:3000 -L 8080:127.0.0.1:8080 -L 5601:127.0.0.1:30300 ladmin@192.168.56.13` 
+
+and then,
 
 ```
 cd /mnt/challenge
@@ -72,50 +79,70 @@ The *prereq.yaml* Ansible playbook will complete several actions, such as:
 
 After this playbook has completed for this first time you'll need to:
 
-### Configure GOGS
-
-- configured GOGS first-run
-  - create user zeus
-- create a GOGS repo called challenge
-
-- init the new repo, on the host run:
-
-Go to the app stack folder:
-
-'
-mkdir prod
-cd prod
-touch README.md
-git init
-git config user.name "zeus"
-git config user.email "zeus@olymp.com"
-git add .
-git commit -m “frist”
-git remote add origin http://localhost:3000/zeus/prod.git
-git push -u origin master
-'
-
 ### Configure Jenkins
 
-1. Get the Jenkins unlock code:
-  
+1. Get the Jenkins unlock code, from LABSRV run: `docker logs jenkins`
+2. Using a browser, from the *host* where the LABSRV VM is running, open `http://localhost:8080`
+3. Install default plugins
+4. Create user zeus/zeus (or anything of your choosing, just remember it)
+5. Create a user token for API calls: `http://localhost:8080/user/cwtf/configure`
+
+**NOTE**: we'll configure the pipeline job in the next sections, remember that the token you've just created will be called `<USER-API-TOKEN>`.
+
+### Configure GOGS
+
+1. Using a browser, from the *host* where the LABSRV VM is running, open `http://localhost:3000`
+2. create a user zeus/zeus
+3. create a new repository called 'pipeline'
+4. back on LABSRV VM, sync the GitHub clone of this repo with the GOGS copy:
+
 ```
-docker logs jenkins
+cd *folder_where_you_cloned_github*
+git remote remove origin
+git remote add origin http://localhost:3000/zeus/pipeline.git
+git push --set-upstream origin master
 ```
 
-2. Install default plugins
-3. Create user zeus/zeus (or anything of your choosing, just remember it)
+## Setting up the actual build
 
-- check minikube dashboard
-  in one terminal get the url:
-  sudo minikube dashboard --url
+1. On LABSRV, in the folder when the source code was cloned:
 
-  open anoher separate session, like:
-  ssh -L 18888:127.0.0.1:39181 ladmin@192.168.56.13
+```
+cd app
+ansible-playbook -i ../hosts build-prereq.yaml
+```
 
-  then use a browser:  
-  http://localhost:18888/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/#/overview?namespace=default
+This will launch the build-prereq.yaml Ansible playbook, which performs the following actions:
+* Installs Helm v3
+* Configures minikube addons
+* Downloads latest official Helm charts from Elastic
+* Installs GOSS
+
+2. Perform a manual deployment, by running:
+
+```
+cd prod
+ansible-playbook -i ../../hosts deploy-all.yaml
+``` 
+
+**NOTE:**: this step is not mandatory, but is a nice checkpoint
+
+3. Configure the Jenkins pipeline job:
+
+* Create a new pipeline job called 'ELK-on-Kubernetes'
+    * Set the GitHub project URL: http://100.0.0.2:3000/zeus/pipeline.git/ (? not required)
+    * This project is parametrized: variable is DEPLOY and options are: 'everything' and 'changes'
+    * Trigger builds remotely (e.g., from scripts), token is 'topsecret'
+    * Paste the contents of the Groovy script 'cicd/Jenkinsfile' into the Script text box
+
+4. In GOGS, select the repo:
+
+* Go to Settings, Web Hooks
+* Create a new Web Hook, with the url as follows:
+
+```
+http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParameters?token=topsecret&DEPLOY=changes
+```
   
-  
-Helpful references:
+## Helpful references:
 * [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)
