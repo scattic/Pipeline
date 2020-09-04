@@ -8,7 +8,7 @@ cd /mnt/challenge/
 git pull origin master
 git add . 
 git commit -m "update"
-git push -u 
+git push --set-upstream origin master
 git remote remove origin
 git remote add origin https://github.com/scattic/pipeline.git
 git push --set-upstream origin master
