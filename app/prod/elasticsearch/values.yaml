@@ -37,7 +37,7 @@ extraEnvs:
 #esConfig:
 #  elasticsearch.yml: |
 #    node.rack: rack123
-
+#
 #esConfig:
 #  elasticsearch.yml: |
 #    key:
