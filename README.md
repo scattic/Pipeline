@@ -78,7 +78,7 @@ The *prereq.yaml* Ansible playbook will complete several actions, such as:
 * download and install minikube and kubectl
 * start Kubernetes cluster on minikube using existing Docker
 
-After this playbook has completed for this first time you'll need to:
+After this playbook has completed for _the first time_ you'll need to:
 
 ### Configure Jenkins
 
@@ -86,7 +86,7 @@ After this playbook has completed for this first time you'll need to:
 2. Using a browser, from the *host* where the LABSRV VM is running, open `http://localhost:8080`
 3. Install default plugins
 4. Create user zeus/zeus (or anything of your choosing, just remember it)
-5. Create a user token for API calls: `http://localhost:8080/user/cwtf/configure`
+5. Create a user token for API calls: `http://localhost:8080/user/zeus/configure`
 
 **NOTE**: we'll configure the pipeline job in the next sections, remember that the token you've just created will be called `<USER-API-TOKEN>`.
 
@@ -119,7 +119,7 @@ This will launch the build-prereq.yaml Ansible playbook, which performs the foll
 * Downloads latest official Helm charts from Elastic
 * Installs GOSS
 
-2. Perform a manual deployment, by running:
+2. Try to perform a manual deployment, by running:
 
 ```
 cd prod
@@ -144,6 +144,16 @@ ansible-playbook -i ../../hosts deploy-all.yaml
 ```
 http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParameters?token=topsecret&DEPLOY=changes
 ```
-  
+
+## Other notes
+
+* The Ansible playbooks which deploy each component of the ELK stack are called `deploy.yaml` and can be found under `./app/prod/<component>`
+* Those playbooks are mainly wrappers for calling the Helm charts, via Make.
+* Tests are available within the `test.yaml` Ansible playbooks in the same folder as above.
+* Tests are written/generated using GOSS, and include functionality and integration.
+* `values.yaml` in the component folder contains the values we chose to customize for our deployment
+* Under `./app/prod/tests` there are few more tests, such as web-app vulnerability scanning with Nikto.
+**NOTE**: Nikto scan has been limited to 60s execution time for ....development efficiency. This limitation would obviously be removed in a production environment.
+
 ## Helpful references:
 * [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)
