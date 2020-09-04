@@ -10,18 +10,18 @@ To replicate the playground environment you should follow the steps below, in or
 **SOLUTION ARCHITECTURE**
 
 ```
-[[ Ubuntu 20.04 VM - LABSRV ]]
-- [Docker]          |                                   .1 (network gateway)
--- {GOGS}           |                                   .2
--- {Jenkins}        |--> network=skynet 100.0.0.0/24    .3
--- {Nikto}          |                                   .4
-- [Minikube]
--- {ElasticSearch-0},{-1},{-2}
--- {Logstash}
--- {Kibana}                       P: int 5601 -> ext: 30300 ; NodePort
--- {FileBeat}
-- [Ansible]
-- [Helm]
+[ Ubuntu 20.04 VM - LABSRV ]
+- Docker              |                                   .1 (network gateway)
+  - { GOGS }           |                                   .2
+  - { Jenkins }        |--> network=skynet 100.0.0.0/24    .3
+  - { Nikto }          |                                   .4
+- Minikube
+  - { ElasticSearch-0 },{-1},{-2}
+  - { Logstash }
+  - { Kibana }                       P: int 5601 -> ext: 30300 ; NodePort
+  - { FileBeat }
+- Ansible
+- Helm
 ```
 
 Components:
