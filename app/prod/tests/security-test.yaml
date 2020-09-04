@@ -11,7 +11,7 @@
     with_items:
     - IP=$(kubectl get pods -o wide | grep kibana | gawk '{print $6}') && docker exec nikto /bin/sh -c "cd /sectools/nikto-master/program && ./nikto.pl -host $IP:5601 -maxtime 60s"
     register: output
-    failed_when: "'7 item(s) reported' not in output.stdout"
+    failed_when: "'6 item(s) reported' not in output.stdout"
 
   - debug:
       var: output.stdout_lines

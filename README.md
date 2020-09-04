@@ -33,14 +33,15 @@ Supporting infrastructure
 _Ubuntu 20.04 VM - LABSRV_
 [Docker](https://www.docker.com/):          |                                .1 (network gateway)
 -- [GOGS](https://gogs.io/)           |                                .2
--- [Jenkins]()        | network=skynet 100.0.0.0/24    .3
--- [Nikto]()          |                                .4
-[Minikube]() for [ELK]()
+-- [Jenkins](https://www.jenkins.io/)        | network=skynet 100.0.0.0/24    .3
+-- [Nikto](https://cirt.net/Nikto2)          |                                .4
+[Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/) for [ELK](https://www.elastic.co/)
 -- ElasticSearch-0,-1,-2
 -- Logstash
 -- Kibana                                                P: int 5601 -> ext: 30300 ; NodePort
 -- FileBeat
-[Ansible]()
+[Ansible](https://www.ansible.com/)
+[Helm](https://helm.sh/)
 
 1. SSH into the VM (LABSRV)
 
@@ -56,8 +57,13 @@ The *prereq.yaml* Ansible playbook will complete several actions, such as:
 * deploy Jenkins in a container, with a persistent volume and forward port 8080
 * deploy Nikto in a container
 * download and install minikube and kubectl
+* start Kubernetes cluster on minikube using existing Docker
 
-After the playbook is finished you'll still need to:
+After this playbook has completed for this first time you'll need to:
+
+*Configure GOGS*
+
+*Configure Jenkins*
 
 - Get the Jenkins unlock code:
   docker logs CONTAINER_ID
@@ -72,6 +78,7 @@ After the playbook is finished you'll still need to:
 
 Go to the app stack folder:
 
+'
 mkdir prod
 cd prod
 touch README.md
@@ -82,6 +89,7 @@ git add .
 git commit -m “frist”
 git remote add origin http://localhost:3000/zeus/prod.git
 git push -u origin master
+'
 
 - check minikube dashboard
   in one terminal get the url:
