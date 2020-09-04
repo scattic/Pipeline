@@ -1,16 +1,41 @@
-DevOps Pipeline Playground
-==========================
+# DevOps Pipeline Playground
 
-Intro
------
+## Intro
 
 This repository contains code for a IaaC/CaaC deployment of ELK & Beats on Kubernetes, along with provisioning
 supporting infrastructure with Ansible and setting up a Jenkins pipeline to tie all pieces together.
 
 To replicate the playground environment you should follow the steps below, in order.
 
-Prerequisites
--------------
+**SOLUTION ARCHITECTURE**
+
+```
+[[ Ubuntu 20.04 VM - LABSRV ]]
+- [Docker]          |                                   .1 (network gateway)
+-- {GOGS}           |                                   .2
+-- {Jenkins}        |--> network=skynet 100.0.0.0/24    .3
+-- {Nikto}          |                                   .4
+- [Minikube]
+-- {ElasticSearch-0},{-1},{-2}
+-- {Logstash}
+-- {Kibana}                       P: int 5601 -> ext: 30300 ; NodePort
+-- {FileBeat}
+- [Ansible]
+- [Helm]
+```
+
+Components:
+* [Docker](https://www.docker.com/)
+* [GOGS](https://gogs.io/)
+* [Nikto](https://cirt.net/Nikto2) 
+* [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
+* [ELK](https://www.elastic.co/)
+* [Ansible](https://www.ansible.com/)
+* [Helm](https://helm.sh/)
+* [GOSS](https://github.com/aelsabbahy/goss)
+
+
+## Prerequisites
 
 1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM.
 
@@ -25,40 +50,14 @@ Prerequisites
 
 3. Enable the SSH server if needed (only if you're not on Ubuntu Server).
 
-Supporting infrastructure
--------------------------
-
-**SOLUTION ARCHITECTURE**
-
-'
-[[ Ubuntu 20.04 VM - LABSRV ]]
-- [Docker]          |                                   .1 (network gateway)
--- {GOGS}           |                                   .2
--- {Jenkins}        |--> network=skynet 100.0.0.0/24    .3
--- {Nikto}          |                                   .4
-- [Minikube]
--- {ElasticSearch-0},{-1},{-2}
--- {Logstash}
--- {Kibana}                       P: int 5601 -> ext: 30300 ; NodePort
--- {FileBeat}
-- [Ansible]
-- [Helm]
-'
-
-Components:
-* [Docker](https://www.docker.com/)
-* [GOGS](https://gogs.io/)
-* [Nikto](https://cirt.net/Nikto2) 
-* [Minikube](https://kubernetes.io/docs/setup/learning-environment/minikube/)
-* [ELK](https://www.elastic.co/)
-* [Ansible](https://www.ansible.com/)
-* [Helm](https://helm.sh/)
-* [GOSS](https://github.com/aelsabbahy/goss)
+## Supporting infrastructure
 
 1. SSH into the VM (LABSRV)
 
-* cd /mnt/challenge
-* ./deploy_prereq.sh
+```
+cd /mnt/challenge
+./deploy_prereq.sh
+```
 
 *deploy_prereq.sh* will install Ansible, create the hosts file and then launch the *prereq.yaml* Ansible playbook.
 
@@ -73,14 +72,7 @@ The *prereq.yaml* Ansible playbook will complete several actions, such as:
 
 After this playbook has completed for this first time you'll need to:
 
-*Configure GOGS*
-
-*Configure Jenkins*
-
-- Get the Jenkins unlock code:
-  docker logs CONTAINER_ID
-  - install plugins
-  - create user zeus
+### Configure GOGS
 
 - configured GOGS first-run
   - create user zeus
@@ -102,6 +94,17 @@ git commit -m “frist”
 git remote add origin http://localhost:3000/zeus/prod.git
 git push -u origin master
 '
+
+### Configure Jenkins
+
+1. Get the Jenkins unlock code:
+  
+```
+docker logs jenkins
+```
+
+2. Install default plugins
+3. Create user zeus/zeus (or anything of your choosing, just remember it)
 
 - check minikube dashboard
   in one terminal get the url:
