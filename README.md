@@ -41,6 +41,7 @@ Components:
   * The normal user account should be called 'ladmin', with the password 'P@ssw0rd'
   * In case you create a different account, don't forget to update the Jenkins job
   * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground.
+  * VirtualBox VM will have two network adapters, one for NAT (or NAT-network) and a Host-Only adapter. The 192.168.56.0 range represents the Host-Only adapter network.
 
 2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 

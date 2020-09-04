@@ -6,6 +6,9 @@ echo WARNING: changes on GitHub will not be considered, and will break the sync
 
 cd /mnt/challenge/
 git pull
+git add . 
+git commit -m "update"
+git push -u 
 git remote remove origin
 git remote add origin https://github.com/scattic/pipeline.git
 git push --set-upstream origin master
