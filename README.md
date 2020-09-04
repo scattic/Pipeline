@@ -30,30 +30,32 @@ Supporting infrastructure
 
 **SOLUTION ARCHITECTURE**
 
-`
-[ Ubuntu 20.04 VM ]
-	- Docker:          |                                .1
-   -- GOGS           |                                .2
-   -- Jenkins        | network=skynet 100.0.0.0/24    .3
-   -- Nikto          |                                .4
-  - Minikube (K8)
-   -- ElasticSearch-0,-1,-2
-   -- Logstash
-   -- Kibana                                                P: int 5601 -> ext: 30300 ; NodePort
-   -- FileBeat
-  - Ansible
-`
+_Ubuntu 20.04 VM - LABSRV_
+[Docker](https://www.docker.com/):          |                                .1 (network gateway)
+-- [GOGS](https://gogs.io/)           |                                .2
+-- [Jenkins]()        | network=skynet 100.0.0.0/24    .3
+-- [Nikto]()          |                                .4
+[Minikube]() for [ELK]()
+-- ElasticSearch-0,-1,-2
+-- Logstash
+-- Kibana                                                P: int 5601 -> ext: 30300 ; NodePort
+-- FileBeat
+[Ansible]()
 
-1. SSH into the VM
+1. SSH into the VM (LABSRV)
 
-  * cd /mnt/challenge
-  * ./deploy_prereq.sh
+* cd /mnt/challenge
+* ./deploy_prereq.sh
 
-This will install Ansible, create the hosts file and then launch the prereq.yaml Ansible playbook.
+*deploy_prereq.sh* will install Ansible, create the hosts file and then launch the *prereq.yaml* Ansible playbook.
 
-The Ansible playbook will complete these actions:
-* install several required packages (apt and pip), such as Docker
-
+The *prereq.yaml* Ansible playbook will complete several actions, such as:
+* install required packages (apt and pip), such as Docker
+* create a Docker network (for IP addresses predictibility)
+* deploy GOGS in a container, with a persistent volume and forward port 3000
+* deploy Jenkins in a container, with a persistent volume and forward port 8080
+* deploy Nikto in a container
+* download and install minikube and kubectl
 
 After the playbook is finished you'll still need to:
 

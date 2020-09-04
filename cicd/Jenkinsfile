@@ -21,13 +21,13 @@ pipeline {
 
     stages {
 
-        stage("checkout") {
+        stage("Checkout code") {
             steps {
                 git url: 'http://100.0.0.2:3000/zeus/pipeline.git'
             }
         }
         
-        stage("sanity check") {
+        stage("Sanity check") {
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/sanity-test.yaml"
             }
@@ -42,7 +42,7 @@ pipeline {
         
         /* --------------------------- Elasticsearch ---------------------------*/
 
-        stage("build-elasticsearch") {
+        stage("BUILD Elasticsearch") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -61,7 +61,7 @@ pipeline {
             }
         }
         
-        stage("test-elasticsearch") {
+        stage("TEST Elasticsearch") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -82,7 +82,7 @@ pipeline {
 
         /* --------------------------- Logstash ---------------------------*/
     
-        stage("build-logstash") {
+        stage("BUILD Logstash") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -95,7 +95,7 @@ pipeline {
             /* since it's not really used by anything atm, this can fail but the job can continue */
         }
         
-        stage("test-logstash") {
+        stage("TEST Logstash") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -109,7 +109,7 @@ pipeline {
 
         /* --------------------------- Kibana ---------------------------*/
 
-        stage("build-kibana") {
+        stage("BUILD Kibana") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -128,7 +128,7 @@ pipeline {
             }
         }
         
-        stage("test-kibana") {
+        stage("TEST Kibana") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -149,7 +149,7 @@ pipeline {
 
         /* --------------------------- Filebeat ---------------------------*/
 
-        stage("build-filebeat") {
+        stage("BUILD Filebeat") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -168,7 +168,7 @@ pipeline {
             }
         }
         
-        stage("test-filebeat") {
+        stage("TEST Filebeat") {
            when { 
                 anyOf {
                     expression {params.DEPLOY == "everything"} ;
@@ -189,13 +189,21 @@ pipeline {
 
         /* --------------------------- Mo testing ---------------------------*/
 
-        stage("test-security") {
+        stage("TEST Security") {
 
             steps {
-                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/test/security-test.yaml"
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/security-test.yaml"
             }
         }
         
+        /* --------------------------- Landing ---------------------------*/
+
+        stage("Cleanup and Report") {
+
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/security-test.yaml"
+            }
+        }
 
     }
 }
