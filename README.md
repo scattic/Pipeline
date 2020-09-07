@@ -143,6 +143,7 @@ ansible-playbook -i ../../hosts deploy-all.yaml
     * This project is parametrized: variable is DEPLOY and options are: 'everything' and 'changes'
     * Trigger builds remotely (e.g., from scripts), token is 'topsecret'
     * Paste the contents of the Groovy script 'cicd/Jenkinsfile' into the Script text box
+    * Do not allow concurrent builds -> checked
 
 4. In GOGS, select the repo:
 
