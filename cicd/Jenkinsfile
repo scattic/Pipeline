@@ -87,7 +87,9 @@ pipeline {
             steps {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/logstash/deploy.yaml"
             }
-            /* since it's not really used by anything atm, this can fail but the job can continue */
+            /* since it's not really used by anything atm, this could fail but the job can continue 
+            consider adding a try/catch block. Same for testing
+            */
         }
         
         stage("TEST Logstash") {
