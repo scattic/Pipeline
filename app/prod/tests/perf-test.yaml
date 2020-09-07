@@ -28,8 +28,8 @@
       shell: kubectl rollout restart deployment elastic-perf-test
 
     - pause:
-        seconds: 15
-        prompt: "INFO: Waiting 15 seconds for tests to complete"
+        seconds: 30
+        prompt: "INFO: Waiting 30 seconds for tests to complete and logs to be recorded"
   
     - name: Check execution time
       shell: kubectl logs $(kubectl get pods | grep -v Terminating | grep elastic-perf | awk '{print $1}') | tail -n 1

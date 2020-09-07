@@ -33,7 +33,7 @@
     - minikube stop 
     - docker volume prune -f 
     - minikube start --driver=none
-    - "kubectl uncordon {{ ansible_env.HOSTNAME }}"
+    - "kubectl uncordon {{ lookup('env','HOSTNAME') }}"
     args:
       warn: no
       #chdir: ./prod/elasticsearch
