@@ -1,0 +1,40 @@
+---
+  - name: Test Elasticsearch performance 
+    hosts: challenge_lab
+    become: yes
+    become_method: sudo
+  
+    tasks:
+
+    - name: Install static code analysis tool (pylint)
+      apt:
+        name: 
+            - pylint
+        state: present
+        update_cache: no
+  
+    - name: Run static code analysis on test code
+      shell: pylint ./perf/perf_test.py --disable=missing-docstring
+      register: pylint_output
+      failed_when: "('10.00/10' not in pylint_output.stdout)"
+  
+    - name: Build Docker image
+      shell: docker build -f ./perf/Dockerfile -t elastic-perf-test:latest ./perf/
+
+    - name: Deploy to Kubernetes
+      shell: kubectl apply -f ./perf/deployment.yaml
+
+    - name: Restart the deployment pods (so that tests get executed)
+      shell: kubectl rollout restart deployment elastic-perf-test
+
+    - pause:
+        seconds: 15
+        prompt: "INFO: Waiting 15 seconds for tests to complete"
+  
+    - name: Check execution time
+      shell: kubectl logs $(kubectl get pods | grep -v Terminating | grep elastic-perf | awk '{print $1}') | tail -n 1
+      register: exec_out
+      failed_when: "(('2.' not in exec_out.stdout) and ('1.' not in exec_out.stdout) and ('0.' not in exec_out.stdout))"
+
+    - name: Clean up 
+      shell: kubectl delete deployment elastic-perf-test

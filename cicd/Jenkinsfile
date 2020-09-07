@@ -173,7 +173,13 @@ pipeline {
                 sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/security-test.yaml"
             }
         }
-        
+
+        stage("TEST Performance") {
+            steps {
+                sshCommand remote: remote, command: "ansible-playbook -i /mnt/challenge/hosts /mnt/challenge/app/prod/tests/perf-test.yaml"
+            }
+        }
+
         /* --------------------------- Landing ---------------------------*/
 
         stage("Cleanup and Report") {

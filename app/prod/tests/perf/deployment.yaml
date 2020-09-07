@@ -1,0 +1,20 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-perf-test
+spec:
+  selector:
+    matchLabels:
+      app: elastic-perf-test
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elastic-perf-test
+    spec:
+      containers:
+      - name: elastic-perf-test
+        image: elastic-perf-test:latest
+        imagePullPolicy: Never
+        

@@ -46,7 +46,7 @@ Components:
 2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder inside the VM, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
 
   *Clone*
-  * `git clone https://github.com/scattic/pipeline.git` _OR_
+  * `git clone https://github.com/scattic/pipeline.git .` _OR_
 
   *Mount*
   * `sudo mkdir /mnt/challenge`
@@ -92,7 +92,7 @@ After this last playbook has completed for _the first time_ you'll need to:
 5. Create a user token for API calls: `http://localhost:8080/user/zeus/configure`
 6. Install the following Jenkins plugins:
     - GOGS
-    - SSH
+    - SSH Pipeline Steps
     - Last Changes
 
 **NOTE**: we'll configure the pipeline job in the next sections, remember that the token you've just created will be called `<USER-API-TOKEN>`.
@@ -165,6 +165,7 @@ http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParam
 * The Jenkins pipeline is parametrized. DEPLOY=everything means all items will be built. DEPLOY=changes means that if a change was made in a component folder (eg filebeat), then only that component will be built (but all tests will still be executed).
 * The Jenkins pipeline will be triggered by a WebHook, which is actually a Jenkins API call.
 * The Jenkinsfile in cicd is not actually valid Jenkinsfile syntax, although it might work with a few small changes.
+* The Performance test will time 100 inserts into ES, followed by query and index deletion. This is done with a Python script, which will first be checked by pylint. The script will be deployed in a temporary pod, and that deployment will get cleaned after completion.
 
 ## Helpful references:
 * [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)
