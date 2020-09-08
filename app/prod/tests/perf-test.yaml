@@ -34,7 +34,7 @@
     - name: Check execution time
       shell: kubectl logs $(kubectl get pods | grep -v Terminating | grep elastic-perf | awk '{print $1}') | tail -n 1
       register: exec_out
-      failed_when: "(('2.' not in exec_out.stdout) and ('1.' not in exec_out.stdout) and ('0.' not in exec_out.stdout))"
+      failed_when: "('TEST-FAILED' in exec_out.stdout)"
 
     - name: Clean up 
       shell: kubectl delete deployment elastic-perf-test

@@ -38,4 +38,7 @@ print(RES)
 
 END = time.time()
 print("> execution completed, run time was: ")
-print(END - START)
+if (END - START)<10:
+  print("TEST-SUCCESS")
+else:
+  print("TEST-FAILED")
