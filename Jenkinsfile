@@ -15,6 +15,14 @@ remote.user = 'ladmin'
 remote.password = 'P@ssw0rd'
 remote.allowAnyHosts = true   
 
+properties([
+  parameters([
+    choice(name: 'DEPLOY',
+           description: 'What do you want to deploy?',
+           choices: 'everything\nchanges')
+  ])
+])
+
 pipeline {
 
     agent any
@@ -23,12 +31,6 @@ pipeline {
 
         stage("Checkout code") {
             steps {
-                
-                script {
-                    currentBuild.displayName = "ELK"
-                    currentBuild.description = "with a description"
-                }
-
                 git url: 'http://100.0.0.2:3000/zeus/pipeline.git'
             }
         }
