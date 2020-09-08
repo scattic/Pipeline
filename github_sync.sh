@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo !!! RUN THIS SCRIPT FROM WITHIN THE VM, KTHXBYE !!!
-echo This script will push changes from GOGS --> GitHub
+echo This script will push changes from GOGS to GitHub
 echo WARNING: changes on GitHub will not be considered, and will break the sync
 
 cd /mnt/challenge/
