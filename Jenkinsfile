@@ -15,13 +15,7 @@ remote.user = 'ladmin'
 remote.password = 'P@ssw0rd' /* yes this should be handled via certificates */
 remote.allowAnyHosts = true   
 
-properties([
-  parameters([
-    choice(name: 'DEPLOY',
-           description: 'What do you want to deploy?',
-           choices: 'everything\nchanges')
-  ])
-])
+parameters { choice(name: 'DEPLOY', choices: ['everything', 'changes'], description: 'What do you want to deploy today?') }
 
 pipeline {
 
