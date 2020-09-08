@@ -141,7 +141,7 @@ ansible-playbook -i ../../hosts deploy-all.yaml
 * Create a new pipeline job called 'ELK-on-K8'
     * Do not allow concurrent builds -> checked
     * Pipeline -> Script from SCM
-    * Repository URL: http://100.0.0.2:3000/zeus/pipeline.git/ 
+    * Repository URL: http://gogs:3000/zeus/pipeline.git/ 
     * Type the credentials (zeus/zeus)
 
 4. In GOGS, select the repo:
@@ -150,7 +150,7 @@ ansible-playbook -i ../../hosts deploy-all.yaml
 * Create a new Web Hook, with the url as follows:
 
 ```
-http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParameters?token=topsecret&DEPLOY=changes
+http://zeus:<USER-API-TOKEN>@jenkins:8080/job/ELK-on-K8/buildWithParameters?token=topsecret&DEPLOY=changes
 ```
 
 ## Other notes
