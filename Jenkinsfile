@@ -23,11 +23,12 @@ pipeline {
 
     stages {
 
-        stage("Checkout code") {
+        // not required if done from the configuration of the job
+        /*stage("Checkout code") {
             steps {
                 git url: 'http://100.0.0.2:3000/zeus/pipeline.git'
             }
-        }
+        }*/
         
         stage("Sanity check") {
             steps {
