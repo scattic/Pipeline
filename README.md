@@ -165,7 +165,6 @@ http://zeus:<USER-API-TOKEN>@100.0.0.3:8080/job/ELK-on-Kubernetes/buildWithParam
 **NOTE**: Nikto scan has been limited to 60s execution time for ....development efficiency. This limitation would obviously be removed in a production environment.
 * The Jenkins pipeline is parametrized. DEPLOY=everything means all items will be built. DEPLOY=changes means that if a change was made in a component folder (eg filebeat), then only that component will be built (but all tests will still be executed).
 * The Jenkins pipeline will be triggered by a WebHook, which is actually a Jenkins API call.
-* The Jenkinsfile in cicd is not actually valid Jenkinsfile syntax, although it might work with a few small changes.
 * The Performance test will time 100 inserts into ES, followed by query and index deletion. This is done with a Python script, which will first be checked by pylint. The script will be deployed in a temporary pod, and that deployment will get cleaned after completion.
 
 ## Helpful references:
