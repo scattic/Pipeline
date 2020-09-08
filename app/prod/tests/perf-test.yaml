@@ -37,4 +37,9 @@
       failed_when: "('TEST-FAILED' in exec_out.stdout)"
 
     - name: Clean up 
-      shell: kubectl delete deployment elastic-perf-test
+      shell: "{{ item }}"
+      with_items:
+      - kubectl delete deployment elastic-perf-test
+      - kubectl delete pod --field-selector=status.phase==Succeeded   # this will also delete all other test pods
+
+    
