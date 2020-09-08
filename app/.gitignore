@@ -1,2 +1,3 @@
 helm-charts/
 elastic-charts.tgz
+one-shot-deploy.yaml.old

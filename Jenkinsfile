@@ -23,6 +23,12 @@ pipeline {
 
         stage("Checkout code") {
             steps {
+                
+                script {
+                    currentBuild.displayName = "ELK"
+                    currentBuild.description = "with a description"
+                }
+
                 git url: 'http://100.0.0.2:3000/zeus/pipeline.git'
             }
         }
