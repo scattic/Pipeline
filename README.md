@@ -138,12 +138,11 @@ ansible-playbook -i ../../hosts deploy-all.yaml
 
 3. Configure the Jenkins pipeline job:
 
-* Create a new pipeline job called 'ELK-on-Kubernetes'
-    * Set the GitHub project URL: http://100.0.0.2:3000/zeus/pipeline.git/ (? not required)
-    * This project is parametrized: variable is DEPLOY and options are: 'everything' and 'changes'
-    * Trigger builds remotely (e.g., from scripts), token is 'topsecret'
-    * Paste the contents of the Groovy script 'cicd/Jenkinsfile' into the Script text box
+* Create a new pipeline job called 'ELK-on-K8'
     * Do not allow concurrent builds -> checked
+    * Pipeline -> Script from SCM
+    * Repository URL: http://100.0.0.2:3000/zeus/pipeline.git/ 
+    * Type the credentials (zeus/zeus)
 
 4. In GOGS, select the repo:
 
