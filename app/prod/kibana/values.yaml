@@ -40,4 +40,4 @@ kibanaConfig:
   kibana.yml: |
     server.name: challenge-kibana
     server.host: "0.0.0.0"
-    status.allowAnonymous: true
+#    status.allowAnonymous: true
