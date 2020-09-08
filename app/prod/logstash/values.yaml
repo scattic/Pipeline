@@ -4,7 +4,7 @@ persistence:
 logstashConfig:
   logstash.yml: |
     http.host: 0.0.0.0
-    xpack.monitoring.enabled: false
+#    xpack.monitoring.enabled: false
 
 logstashPipeline:
   uptime.conf: |
