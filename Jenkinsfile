@@ -12,7 +12,7 @@ def remote = [:]
 remote.name = 'labsrv'
 remote.host = '100.0.0.1'
 remote.user = 'ladmin'
-remote.password = 'P@ssw0rd'
+remote.password = 'P@ssw0rd' /* yes this should be handled via certificates */
 remote.allowAnyHosts = true   
 
 properties([
