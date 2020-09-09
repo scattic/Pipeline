@@ -64,6 +64,14 @@
       warn: no
       creates: /usr/local/bin/goss
 
+  - name: Install Elasticsearch pip library for pylint
+    command: "{{ item }}"
+    with_items:
+    - pip3 install elasticsearch
+    args:
+      warn: no
+    ignore_errors: True
+
 #  - name: Installing DGOSS (for Docker)
 #    shell: "{{ item }}"
 #    with_items:
