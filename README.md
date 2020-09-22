@@ -38,9 +38,9 @@ Components:
 ## Prerequisites
 
 1. Start with a freshly installed VM of Ubuntu Server 20.04. [VirtualBox](https://www.virtualbox.org/) is a nice hypervisor to host the VM. 
-  * The normal user account should be called `ladmin`, with the password `P@ssw0rd`
+  * The normal user account could be called `ladmin`. Remember the password, it should be updated in the Jenkinsfile.
   * In case you create a different account, don't forget to update the Jenkins job.
-  * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground.
+  * And yes, ssh with certificates should be used for auth instead of user & psw, but this is just a playground, and we'll update this at a later stage
   * VirtualBox VM will have two network adapters, one for NAT (or NAT-network) and a Host-Only adapter. The 192.168.56.0 range represents the Host-Only adapter network.
 
 2. Clone [this git repo](https://github.com/scattic/pipeline) into a folder inside the VM, or mount the folder with the repo contents from the host. If/when you see */mnt/challenge* below, that is the root of the source code folder - adapt as needed. 
@@ -100,7 +100,7 @@ After this last playbook has completed for _the first time_ you'll need to:
 ### Configure GOGS
 
 1. Using a browser, from the *host* where the LABSRV VM is running, open `http://localhost:3000`
-2. create a user zeus/zeus
+2. create a user, for example: `zeus`
 3. choose SQLite3 as the DB
 4. create a new repository called 'pipeline'
 5. back on LABSRV VM, sync the GitHub clone of this repo with the GOGS copy:
@@ -142,7 +142,7 @@ ansible-playbook -i ../../hosts deploy-all.yaml
     * Do not allow concurrent builds -> checked
     * Pipeline -> Script from SCM
     * Repository URL: http://gogs:3000/zeus/pipeline.git/ 
-    * Type the credentials (zeus/zeus)
+    * Type the credentials (`zeus` and the password for it)
 
 4. In GOGS, select the repo:
 
@@ -165,6 +165,12 @@ http://zeus:<USER-API-TOKEN>@jenkins:8080/job/ELK-on-K8/buildWithParameters?toke
 * The Jenkins pipeline is parametrized. DEPLOY=everything means all items will be built. DEPLOY=changes means that if a change was made in a component folder (eg filebeat), then only that component will be built (but all tests will still be executed).
 * The Jenkins pipeline will be triggered by a WebHook, which is actually a Jenkins API call.
 * The Performance test will time 100 inserts into ES, followed by query and index deletion. This is done with a Python script, which will first be checked by pylint. The script will be deployed in a temporary pod, and that deployment will get cleaned after completion.
+* FileBeat will ingest all Kubernetes logs since its pod will map to the /var/log folder on the LABSRV VM
+
+## To do
+* Improve security by using HTTPS and authentication for ELK
+* Improve Kubernetes and Docker security
+* Integrate a static code analysis tool, see https://owasp.org/www-community/Source_Code_Analysis_Tools
 
 ## Helpful references:
 * [https://www.computers.wtf/posts/jenkins-webhook-with-parameters/](https://www.computers.wtf/posts/jenkins-webhook-with-parameters/)
